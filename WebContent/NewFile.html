@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="assets/css/animate.css" />
+<script type="text/javascript" src="assets/js/jquery.min.js">
+	
+</script>
+<script type="text/javascript" src="assets/js/amazeui.min.js">
+	
+</script>
+<style type="text/css" media=screen>
+#editcontent {
+	border-left: 1px solid #AAAAAA
+}
+
+#editdiv, #component-edit, #component-add, #page-add, #page-edit {
+	border: 1px solid #AAAAAA;
+}
+
+#editdiv {
+	overflow-x: hidden;
+}
+
+#component-edit, #component-add, #page-add, #page-edit {
+	margin-bottom: 10px;
+	width: 100%
+}
+
+/* .imgdiv {
+	width: 100px
+} */
+.imgdiv img {
+	width: 100%
+}
+
+.selected {
+	border: 1px dashed #AAAAAA
+}
+
+.Full-Absolute-Center {
+	width: 85%;
+	height: 98%;
+	overflow: auto;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.Absolute-Center {
+	width: 50%;
+	height: 70%;
+	overflow: auto;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.Center-Container {
+	position: relative;
+}
+</style>
+<link rel="stylesheet" href="assets/css/amazeui.min.css" />
+<script type="text/javascript">
+	//动画类型数组
+	var flash_arr = [ 'flip', 'shake' ];
+
+	$(function() {
+		//根据浏览器大小确定DIV大小
+		$("#editcontent").css("height", document.body.scrollHeight + "px");
+		$("#confirmcontent").css("height", document.body.scrollHeight + "px");
+
+		addComponentInit();
+	});
+
+	//添加组件后需要初始化的动作
+	function addComponentInit() {
+		//给图片组件绑定事件
+		$(".imgdiv").bind("click", function() {
+			//隐藏其他编辑区域
+			$("#edittextdiv").hide();
+			//显示图片编辑
+			$("#editimgdiv").show();
+			//标示此组件
+			$("#editcontent .selected").removeClass("selected");
+			$(this).addClass("selected");
+		});
+
+		//给非动画的组件绑定事件
+		$(".unanimated").bind("click", function() {
+			//隐藏动画编辑区域
+			$("#editanimateddiv").hide();
+		});
+		//给动画的组件绑定事件
+		$(".animated").bind("click", function() {
+			//显示动画编辑区域
+			$("#editanimateddiv").show();
+		});
+
+		//给可移动的组件绑定事件
+		var editablediv$ = $(".moveable");
+		for (var i = 0; i < editablediv$.length; i++) {
+			makeDraggable(editablediv$[i]);
+		}
+
+		//给可编辑的组件绑定点击事件
+		$(".editable").bind("click", function() {
+			//标示此组件
+			$("#editcontent .selected").removeClass("selected");
+			$(this).addClass("selected");
+
+			//显示文本编辑区域
+			$("#edittextdiv").show();
+			//隐藏其他编辑区域
+			$("#editimgdiv").hide();
+
+			$("#component-edit #edittext").val($(this).text());
+			$("#component-edit #component-id").val($(this).attr("id"));
+		});
+	}
+
+	//确定文本内容的保存
+	function confirmtextedit() {
+		var editdocid = $("#component-edit #component-id").val();
+		$("#" + editdocid).text($("#edittext").val());
+		if ($("#editflash option:selected").val().length > 0) {
+			for (var i = 0; i < flash_arr.length; i++) {
+				$("#" + editdocid).removeClass(flash_arr[i]);
+			}
+			$("#" + editdocid).addClass($("#editflash option:selected").val());
+		}
+	}
+</script>
+
+<script type="text/javascript">
+	Number.prototype.NaN0 = function() {
+		return isNaN(this) ? 0 : this;
+	}
+	var iMouseDown = false;
+	var dragObject = null;
+	var curTarget = null;
+	function makeDraggable(item) {
+		if (!item)
+			return;
+		item.style.cursor = 'move';
+		item.onmousedown = function(ev) {
+			dragObject = this;
+			mouseOffset = getMouseOffset(this, ev);
+			return false;
+		}
+	}
+	function getMouseOffset(target, ev) {
+		ev = ev || window.event;
+		var docPos = getPosition(target);
+		var mousePos = mouseCoords(ev);
+		return {
+			x : mousePos.x - docPos.x,
+			y : mousePos.y - docPos.y
+		};
+	}
+	function getPosition(e) {
+		var left = 0;
+		var top = 0;
+		while (e.offsetParent) {
+			left += e.offsetLeft
+					+ (e.currentStyle ? (parseInt(e.currentStyle.borderLeftWidth))
+							.NaN0()
+							: 0);
+			top += e.offsetTop
+					+ (e.currentStyle ? (parseInt(e.currentStyle.borderTopWidth))
+							.NaN0()
+							: 0);
+			e = e.offsetParent;
+		}
+		left += e.offsetLeft
+				+ (e.currentStyle ? (parseInt(e.currentStyle.borderLeftWidth))
+						.NaN0() : 0);
+		top += e.offsetTop
+				+ (e.currentStyle ? (parseInt(e.currentStyle.borderTopWidth))
+						.NaN0() : 0);
+		return {
+			x : left,
+			y : top
+		};
+	}
+	function mouseCoords(ev) {
+		if (ev.pageX || ev.pageY) {
+			return {
+				x : ev.pageX,
+				y : ev.pageY
+			};
+		}
+		return {
+			x : ev.clientX + document.body.scrollLeft
+					- document.body.clientLeft,
+			y : ev.clientY + document.body.scrollTop - document.body.clientTop
+		};
+	}
+	function mouseDown(ev) {
+		ev = ev || window.event;
+		var target = ev.target || ev.srcElement;
+		if (target.onmousedown || target.getAttribute('DragObj')) {
+			return false;
+		}
+	}
+	function mouseUp(ev) {
+		dragObject = null;
+		iMouseDown = false;
+	}
+	function mouseMove(ev) {
+		ev = ev || window.event;
+		/*
+		We are setting target to whatever item the mouse is currently on
+		Firefox uses event.target here, MSIE uses event.srcElement
+		 */
+		var target = ev.target || ev.srcElement;
+		var mousePos = mouseCoords(ev);
+		if (dragObject) {
+			dragObject.style.position = 'absolute';
+			dragObject.style.top = (mousePos.y - mouseOffset.y - document
+					.getElementById("editdiv").getBoundingClientRect().top)
+					+ 'px';
+			dragObject.style.left = (mousePos.x - mouseOffset.x - document
+					.getElementById("editdiv").getBoundingClientRect().left)
+					+ 'px';
+		}
+		// track the current mouse state so we can compare against it next time
+		lMouseState = iMouseDown;
+		// this prevents items on the page from being highlighted while dragging
+		if (curTarget || dragObject)
+			return false;
+	}
+	document.onmousemove = mouseMove;
+	document.onmousedown = mouseDown;
+	document.onmouseup = mouseUp;
+
+	//根据编辑页面的DIV大小确定字体大小
+	function adeptFontSize() {
+		var div_width = document.getElementById("editdiv").clientWidth;
+		var total_width = document.body.scrollWidth;
+		var em_value = total_width / div_width;
+		$(".editable").css("font-size", em_value + "em")
+	}
+
+	//将图片组件的宽度改为百分比
+	function saveImgDIv() {
+		//取编辑页面的容器总宽度
+		var total_width = document.getElementById("editdiv").clientWidth;
+		var imgDivArry = $("#editdiv .imgdiv");
+		for (var i = 0; i < imgDivArry.length; i++) {
+			var imgDiv = imgDivArry[i];
+			var width = imgDiv.clientWidth;
+			var width_auto = width / total_width * 100;
+			imgDiv.style.width = width_auto + "%";
+		}
+	}
+
+	//将移动过的组件用百分比定位
+	function saveMoveItem() {
+		var moveItemArry = $("#editdiv .moveable");
+		//取编辑页面的容器总宽度和高度
+		var total_width = document.getElementById("editdiv").clientWidth;
+		var total_height = document.getElementById("editdiv").clientHeight;
+		for (var i = 0; i < moveItemArry.length; i++) {
+			var move_item = moveItemArry[i];
+			if (move_item.style.position == 'absolute') {
+				//取纵向绝对值
+				var item_top = (move_item.style.top + "");
+				item_top = item_top.substring(0, item_top.length - 2);
+				//计算百分比
+				var item_top_auto = item_top / total_height * 100;
+				move_item.style.top = item_top_auto + "%";
+				//将宽度设为最大
+				move_item.style.width = "100%";
+				//取横向绝对值
+				var item_left = (move_item.style.left + "");
+				item_left = item_left.substring(0, item_left.length - 2);
+				//计算百分比
+				var item_left_auto = item_left / total_width * 100;
+				move_item.style.left = item_left_auto + "%";
+
+			}
+		}
+	}
+
+	function saveAllPages() {
+		saveImgDIv();
+		adeptFontSize();
+		saveMoveItem();
+		
+		$("#result").val($("#editdiv").html());
+		$("#editdiv").html("");
+	}
+
+	function addTextDiv() {
+		var text_div_html = $("#textDivDemo").html();
+		var time = new Date().getTime();
+		$("#editdiv").append(text_div_html.replace("@timeid@", time));
+		//添加组件后需要初始化的动作
+		addComponentInit();
+	}
+
+	//修改字体
+	function changeTextFontFamily() {
+		$("#editfontfamily option:selected").val();
+	}
+	
+	//修改图片大小
+	function sizeImgDIv(addsize){
+		
+	}
+</script>
+
+</head>
+<body>
+
+	<div class="am-g">
+
+		<div class="am-u-sm-4 Center-Container" id="confirmcontent">
+			<div class="Full-Absolute-Center">
+				<div id="page-add">
+					<h3>添加新页面</h3>
+					<hr data-am-widget="divider" class="am-divider am-divider-default" />
+					<ul data-am-widget="gallery"
+						class="am-gallery am-avg-sm-2 am-gallery-bordered"
+						data-am-gallery="{  }">
+						<li>
+							<div class="am-gallery-item">
+								<a href="http://s.amazeui.org/media/i/demos/bing-1.jpg" class="">
+									<img src="http://s.amazeui.org/media/i/demos/bing-1.jpg"
+									alt="远方 有一个地方 那里种有我们的梦想" />
+									<h3 class="am-gallery-title">远方 有一个地方 那里种有我们的梦想</h3>
+									<div class="am-gallery-desc">2375-09-26</div>
+								</a>
+							</div>
+						</li>
+						<li>
+							<div class="am-gallery-item">
+								<a href="http://s.amazeui.org/media/i/demos/bing-2.jpg" class="">
+									<img src="http://s.amazeui.org/media/i/demos/bing-2.jpg"
+									alt="某天 也许会相遇 相遇在这个好地方" />
+									<h3 class="am-gallery-title">某天 也许会相遇 相遇在这个好地方</h3>
+									<div class="am-gallery-desc">2375-09-26</div>
+								</a>
+							</div>
+						</li>
+					</ul>
+					<br>
+					<button type="button" class="am-btn am-btn-default">取消</button>
+					<button type="button" class="am-btn am-btn-primary">确定</button>
+				</div>
+				<div id="page-edit">
+					<h3>页面编辑</h3>
+					<hr data-am-widget="divider" class="am-divider am-divider-default" />
+					翻页动作<input class="am-fr" type="text" /><br> 背景<input
+						class="am-fr" type="text" /><br>
+				</div>
+				<div class="am-vertical-align-bottom" id="component-add">
+					<h3>组件添加</h3>
+					<hr data-am-widget="divider" class="am-divider am-divider-default" />
+					<button type="button" class="am-btn am-btn-default">图片</button>
+					<button type="button" onclick="addTextDiv()"
+						class="am-btn am-btn-default">文本</button>
+					<br>
+				</div>
+				<div class="am-vertical-align-bottom" id="component-edit">
+					<input type="hidden" id="component-id" />
+					<!-- 组件id -->
+					<h3>组件编辑</h3>
+					<hr data-am-widget="divider" class="am-divider am-divider-default" />
+					<div id="edittextdiv" style="display: none">
+						<textarea id="edittext" style="width: 100%"></textarea>
+						<div>
+							<select data-am-selected id="editfontfamily"
+								onselect="changeTextFontFamily()">
+								<option value="SimSun">宋体</option>
+								<option value="SimHei">黑体</option>
+								<option value="Microsoft YaHei">微软雅黑</option>
+								<option value="Microsoft JhengHei">微软正黑体</option>
+								<option value="NSimSun">新宋体</option>
+								<option value="PMingLiU">新细明体</option>
+								<option value=" MingLiU">细明体</option>
+								<option value=" DFKai-SB">标楷体</option>
+								<option value="FangSong">仿宋</option>
+								<option value="KaiTi">楷体</option>
+								<option value="GB2312 FangSong_GB2312">仿宋</option>
+								<option value="GB2312 KaiTi_GB2312">楷体</option>
+							</select>
+							<div class="am-btn-group">
+								<button type="button" onclick="smallerFontSize()"
+									style="height: 50px" class="am-btn am-btn-default">
+									<i class=" am-icon-font"></i>
+								</button>
+								<button type="button" onclick="biggerFontSize()"
+									style="height: 50px" class="am-btn am-btn-default">
+									<i class="am-icon-font am-icon-md"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div id="editimgdiv" style="display: none">
+						<div>图片路径:<input type="text" id="editimg" class="am-fr" /></div>
+						<button type="button" class="am-btn am-btn-default" onclick="sizeImgDIv(-2)">缩小</button>
+						<button  type="button" class="am-btn am-btn-default"  onclick="sizeImgDIv(2)">放大</button>
+						<button  type="button" class="am-btn am-btn-default"  onclick="">旋转</button>
+					</div>
+					<div id="editanimateddiv" style="display: none; padding-top: 10px">
+						动画: <select data-am-selected id="editflash">
+							<option value="shake">摇晃</option>
+							<option value="flip" selected>翻转</option>
+						</select>
+						<button type="button" class="am-btn am-btn-default">高级设置</button>
+					</div>
+					<br>
+					<button type="button" class="am-btn am-btn-primary"
+						onclick="confirmtextedit()">确定</button>
+					<button type="button" class="am-btn am-btn-danger" id="delbtn">删除该组件</button>
+				</div>
+				<button type="button" onclick="saveAllPages()">完成编辑</button>
+				<input type="text" id="result" />
+			</div>
+
+		</div>
+
+		<div class="am-u-sm-8 Center-Container" id="editcontent">
+			<div id="editdiv" class="Absolute-Center">
+
+				<div class="moveable"
+					style="cursor: move; position: absolute; top: 70.3683977455717%; left: 30.2984964622642%;">
+					<div class="imgdiv  animated shake">
+						<img src="assets/img/yixiu/icon.png">
+					</div>
+				</div>
+
+				<div class="moveable"
+					style="cursor: move; position: absolute; top: 73.8331320450886%; left: 47.1852889150943%;">
+					<div class="imgdiv  animated  shake">
+						<img src="assets/img/yixiu/hand.png">
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+		</div>
+
+		<!-- 文本组件模板 -->
+		<div style="display: none" id="textDivDemo">
+			<div class="moveable">
+				<div class="editable animated" id="@timeid@">点击后在“组件编辑中”编辑文字</div>
+			</div>
+		</div>
+
+		<!-- 图片组件模板 -->
+		<div style="display: none" id="imgDivDemo">
+			<div class="moveable">
+				<div class="imgdiv animated" id="@timeid@">点击后在“组件编辑中”编辑文字</div>
+			</div>
+		</div>
+
+	</div>
+
+	</div>
+</body>
+</html>

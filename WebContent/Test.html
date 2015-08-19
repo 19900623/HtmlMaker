@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="assets/css/animate.css" />
+<style type="text/css" media=screen>
+.imgdiv img {
+	width: 100%
+}
+
+body {
+	margin: 0px;
+}
+
+.pageinner {
+	overflow-x: hidden;
+	position: relative;
+}
+
+#basediv {
+	background: url('assets/img/yixiu/bg.png');
+	background-size: cover;
+	background-position: center center;
+	display: block;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+</style>
+<script type="text/javascript">
+	$(function() {
+		$(".pageinner").css("height", document.body.scrollHeight + "px");
+		$(".pageinner").css("width", document.body.scrollWidth + "px");
+	})
+</script>
+
+</head>
+<body>
+	<ul>
+		<li id="basediv">
+			<div class="pageinner">
+
+				<div class="moveable"
+					style="cursor: move; position: absolute; top: 4.81671133231241%; left: 50.5589622641509%; width: 100%;">
+					<div class="imgdiv  animated shake"
+						style="width: 24.5283018867925%;">
+						<img src="assets/img/yixiu/icon.png">
+					</div>
+				</div>
+				<div class="moveable"
+					style="cursor: move; position: absolute; top: 73.2700038284839%; left: 11.1438679245283%; width: 100%;">
+					<div class="imgdiv  animated  shake selected"
+						style="width: 21.4622641509434%;">
+						<img src="assets/img/yixiu/hand.png">
+					</div>
+				</div>
+
+			</div>
+		</li>
+	</ul>
+</body>
+</html>
